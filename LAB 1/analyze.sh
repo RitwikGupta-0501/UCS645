@@ -8,7 +8,6 @@ if [ -z "$BINARY" ]; then
     exit 1
 fi
 
-# Output CSV file
 OUTPUT_FILE="performance_metrics.csv"
 echo "Threads,Time_Elapsed,User_Time,Sys_Time,IPC,CPU_Utilization,Frequency_GHz" > $OUTPUT_FILE
 
@@ -17,12 +16,16 @@ THREAD_COUNTS=(1 2 3 4 5 6 7 8)
 echo "Starting performance analysis for $BINARY..."
 
 for T in "${THREAD_COUNTS[@]}"; do
+    echo "---------------------------------------"
     echo "Running with $T threads..."
     
     export OMP_NUM_THREADS=$T
+    
+    PROG_OUTPUT=$(./"$BINARY")
+    echo "Program Output: $PROG_OUTPUT"
+    
     perf stat -o perf_tmp.txt ./"$BINARY" > /dev/null
 
-    # Extract metrics using awk/grep
     TIME=$(grep "seconds time elapsed" perf_tmp.txt | awk '{print $1}')
     USER=$(grep "seconds user" perf_tmp.txt | awk '{print $1}')
     SYS=$(grep "seconds sys" perf_tmp.txt | awk '{print $1}')
@@ -30,9 +33,9 @@ for T in "${THREAD_COUNTS[@]}"; do
     UTIL=$(grep "CPUs utilized" perf_tmp.txt | awk '{print $4}')
     FREQ=$(grep "GHz" perf_tmp.txt | awk '{print $4}')
 
-    # Append to CSV
     echo "$T,$TIME,$USER,$SYS,$IPC,$UTIL,$FREQ" >> $OUTPUT_FILE
 done
 
 rm perf_tmp.txt
+echo "---------------------------------------"
 echo "Analysis complete. Data saved to $OUTPUT_FILE."
