@@ -12,7 +12,6 @@ fi
 OUTPUT_FILE="performance_metrics.csv"
 echo "Threads,Time_Elapsed,User_Time,Sys_Time,IPC,CPU_Utilization,Frequency_GHz" > $OUTPUT_FILE
 
-# Thread counts to test (tailored for your i7-8550U)
 THREAD_COUNTS=(1 2 3 4 5 6 7 8)
 
 echo "Starting performance analysis for $BINARY..."
@@ -20,8 +19,6 @@ echo "Starting performance analysis for $BINARY..."
 for T in "${THREAD_COUNTS[@]}"; do
     echo "Running with $T threads..."
     
-    # Run perf and capture output to a temporary file
-    # We use -o to redirect perf's own output
     export OMP_NUM_THREADS=$T
     perf stat -o perf_tmp.txt ./"$BINARY" > /dev/null
 
