@@ -20,7 +20,7 @@ Benchmarks were conducted on the following hardware:
 ### Source Code
 
 * **`q1.c`**: Implementation of a **DAXPY loop** (Double precision ).
-* **`q2_1d.c` / `q2_2d.c**`: Parallel **Matrix Multiplication** () comparing 1D row-partitioning vs. 2D loop-collapse strategies.
+* **`q2_1d.c`** / **`q2_2d.c`**: Parallel **Matrix Multiplication** () comparing 1D row-partitioning vs. 2D loop-collapse strategies.
 * **`q3.c`**: Numerical integration to approximate the value of **** using the `reduction` clause.
 
 ### Automation & Analysis
