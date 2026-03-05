@@ -28,6 +28,10 @@ int main(int argc, char **argv) {
     printf("\n\n");
   }
 
+  // Synchronize all processes before timing
+  MPI_Barrier(MPI_COMM_WORLD);
+  double start_time = MPI_Wtime();
+
   // Distribute both vectors to all processes
   MPI_Scatter(A, chunk_size, MPI_INT, local_A, chunk_size, MPI_INT, 0,
               MPI_COMM_WORLD);
@@ -45,9 +49,15 @@ int main(int argc, char **argv) {
   int global_dot = 0;
   MPI_Reduce(&local_dot, &global_dot, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
 
+  // Synchronize before stopping timer
+  MPI_Barrier(MPI_COMM_WORLD);
+  double end_time = MPI_Wtime();
+
   if (rank == 0) {
     printf("\nDot Product : %d\n", global_dot);
     printf("Expected    : 120\n");
+    printf("\nExecution Time with %d process(es): %f seconds\n", size,
+           end_time - start_time);
   }
 
   MPI_Finalize();

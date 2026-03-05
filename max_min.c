@@ -19,10 +19,14 @@ int main(int argc, char **argv) {
   int numbers[NUMS_PER_PROC];
   printf("Process %d generated: ", rank);
   for (int i = 0; i < NUMS_PER_PROC; i++) {
-    numbers[i] = rand() % 1001; // 0 to 1000
+    numbers[i] = rand() % 1001;
     printf("%d ", numbers[i]);
   }
   printf("\n");
+
+  // Synchronize all processes before timing
+  MPI_Barrier(MPI_COMM_WORLD);
+  double start_time = MPI_Wtime();
 
   // Find local max and min
   int local_max = numbers[0];
@@ -56,11 +60,17 @@ int main(int argc, char **argv) {
   MPI_Reduce(&local_min_loc, &global_min_loc, 1, MPI_2INT, MPI_MINLOC, 0,
              MPI_COMM_WORLD);
 
+  // Synchronize before stopping timer
+  MPI_Barrier(MPI_COMM_WORLD);
+  double end_time = MPI_Wtime();
+
   if (rank == 0) {
     printf("\nGlobal Maximum: %d (found on Process %d)\n", global_max_loc.value,
            global_max_loc.rank);
     printf("Global Minimum: %d (found on Process %d)\n", global_min_loc.value,
            global_min_loc.rank);
+    printf("\nExecution Time with %d process(es): %f seconds\n", size,
+           end_time - start_time);
   }
 
   MPI_Finalize();
